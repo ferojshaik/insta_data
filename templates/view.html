@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Instagram Activity Log</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #fafafa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .activity-card {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin: 4px 0;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .duration {
+            float: right;
+            color: #666;
+        }
+        .button {
+            background: #0095f6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Activity Log</h1>
+        
+        {% for activity in activities|reverse %}
+        <div class="activity-card">
+            <div class="timestamp">
+                {{ activity.timestamp }}
+                <span class="duration">{{ activity.duration }}s</span>
+            </div>
+            <div class="type-badge">{{ activity.type }}</div>
+            {% if activity.username %}
+            <div><strong>Username:</strong> {{ activity.username }}</div>
+            {% endif %}
+            {% if activity.content %}
+            <div><strong>Content:</strong> {{ activity.content }}</div>
+            {% endif %}
+            {% if activity.url %}
+            <div><a href="{{ activity.url }}" target="_blank">View on Instagram</a></div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <a href="/" class="button">Back to Tracker</a>
+    </div>
+</body>
+</html>

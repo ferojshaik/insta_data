@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Instagram Post Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #fafafa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .button {
+            background: #0095f6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #e8f5e9; }
+        .error { background: #ffebee; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Instagram Post Tracker</h1>
+        
+        <div class="input-group">
+            <input type="text" id="postUrl" placeholder="Paste Instagram post URL here">
+            <button class="button" onclick="trackPost()">Track Post</button>
+        </div>
+
+        <div id="status"></div>
+        
+        <button class="button" onclick="window.location.href='/view'" style="margin-top: 20px;">
+            View Tracked Posts
+        </button>
+    </div>
+
+    <script>
+    function trackPost() {
+        const url = document.getElementById('postUrl').value.trim();
+        
+        if (!url) {
+            showStatus('Please enter a URL', 'error');
+            return;
+        }
+        
+        if (!url.includes('instagram.com/p/')) {
+            showStatus('Please enter a valid Instagram post URL', 'error');
+            return;
+        }
+
+        showStatus('Tracking post...', 'info');
+
+        fetch('/track', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url: url })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showStatus('Error: ' + data.error, 'error');
+            } else {
+                showStatus('Post tracked successfully!', 'success');
+                document.getElementById('postUrl').value = '';
+            }
+        })
+        .catch(error => {
+            showStatus('Error: ' + error, 'error');
+        });
+    }
+
+    function showStatus(message, type) {
+        const status = document.getElementById('status');
+        status.innerHTML = message;
+        status.className = 'status ' + type;
+    }
+    </script>
+</body>
+</html>
