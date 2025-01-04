@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Instagram Activity Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #fafafa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #0095f6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        #status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .tracking {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Instagram Activity Tracker</h1>
+        
+        <div class="instructions">
+            <h3>How to use:</h3>
+            <ol>
+                <li>Copy the tracking code below</li>
+                <li>Open Instagram in a new tab</li>
+                <li>Open browser developer tools (three dots → More tools → Developer tools)</li>
+                <li>Go to Console tab</li>
+                <li>Paste the code and press Enter</li>
+                <li>Browse Instagram normally</li>
+            </ol>
+        </div>
+
+        <textarea id="trackingCode" style="width: 100%; height: 100px; margin: 10px 0;" readonly>
+// Instagram Activity Tracker
+(function(){
+    let lastUrl = '';
+    let startTime = Date.now();
+    
+    function trackActivity(type, data) {
+        fetch('/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: type,
+                url: window.location.href,
+                username: data.username || '',
+                content: data.content || '',
+                duration: Math.round((Date.now() - startTime) / 1000)
+            })
+        });
+        startTime = Date.now();
+    }
+    
+    setInterval(() => {
+        let currentUrl = window.location.href;
+        if (currentUrl !== lastUrl) {
+            lastUrl = currentUrl;
+            
+            let data = {};
+            if (currentUrl.includes('/p/')) {
+                data.type = 'post';
+            } else if (currentUrl.includes('/reels/')) {
+                data.type = 'reel';
+            } else if (currentUrl.includes('/stories/')) {
+                data.type = 'story';
+            } else if (currentUrl.match(/instagram\.com\/[^/]+\/?$/)) {
+                data.type = 'profile';
+                data.username = currentUrl.split('/')[3];
+            }
+            
+            if (data.type) {
+                trackActivity(data.type, data);
+            }
+        }
+    }, 1000);
+    
+    console.log('Instagram Activity Tracker is running!');
+})();
+        </textarea>
+
+        <button class="button" onclick="copyCode()">Copy Tracking Code</button>
+        <button class="button" onclick="window.location.href='/view'">View Activity Log</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+    function copyCode() {
+        const codeElement = document.getElementById('trackingCode');
+        codeElement.select();
+        document.execCommand('copy');
+        
+        const status = document.getElementById('status');
+        status.textContent = 'Code copied! Now paste it in Instagram\'s console.';
+        status.className = 'tracking';
+    }
+    </script>
+</body>
+</html> 
